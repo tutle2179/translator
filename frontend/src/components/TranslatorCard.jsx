@@ -1,5 +1,20 @@
 import { useState } from "react";
-import { Card, Input, Button, Typography, Tag } from "antd";
+import {
+    Card,
+    Input,
+    Button,
+    Typography,
+    Tag,
+    Space,
+    message,
+} from "antd";
+
+import {
+    SoundOutlined,
+    CopyOutlined,
+    SaveOutlined,
+} from "@ant-design/icons";
+
 import { translateText } from "../api";
 
 const { Title } = Typography;
@@ -11,6 +26,7 @@ function TranslatorCard() {
     const [engine, setEngine] = useState("");
     const [loading, setLoading] = useState(false);
 
+    // 🔹 번역 실행
     const handleTranslate = async () => {
         if (!input.trim()) return;
 
@@ -26,17 +42,57 @@ function TranslatorCard() {
         setLoading(false);
     };
 
+    // 🔹 독일어 음성 읽기
+    const speakGerman = () => {
+        if (!output) return;
+
+        const utterance = new SpeechSynthesisUtterance(output);
+        utterance.lang = "de-DE";
+        utterance.rate = 0.9;
+        utterance.pitch = 1;
+
+        window.speechSynthesis.speak(utterance);
+    };
+
+    // 🔹 복사 기능
+    const copyToClipboard = async () => {
+        if (!output) return;
+
+        try {
+            await navigator.clipboard.writeText(output);
+            message.success("복사 완료");
+        } catch {
+            message.error("복사 실패");
+        }
+    };
+
+    // 🔹 음성 인식
+    const startListening = () => {
+        const SpeechRecognition =
+            window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+            message.error("이 브라우저는 음성 인식을 지원하지 않습니다.");
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = "de-DE";
+        recognition.interimResults = false;
+
+        recognition.onresult = (event) => {
+            const speechText = event.results[0][0].transcript;
+            message.success("인식된 문장: " + speechText);
+        };
+
+        recognition.start();
+    };
+
     return (
-        <Card
-            title="German Translator"
-            style={{ width: "100%" }}
-        >
+        <Card title="독일어 번역기" style={{ width: "100%" }}>
+
             {/* 입력 영역 */}
-            <Card
-                type="inner"
-                title="한국어 입력"
-                extra={<a href="#">Clear</a>}
-            >
+            <Card type="inner" title="한국어 입력">
                 <TextArea
                     rows={5}
                     value={input}
@@ -62,11 +118,7 @@ function TranslatorCard() {
                 title="독일어 번역 결과"
                 style={{ marginTop: 16 }}
             >
-                <TextArea
-                    rows={5}
-                    value={output}
-                    readOnly
-                />
+                <TextArea rows={5} value={output} readOnly />
 
                 {engine && (
                     <div style={{ marginTop: 15 }}>
@@ -76,6 +128,37 @@ function TranslatorCard() {
                         </Tag>
                     </div>
                 )}
+
+                {/* 버튼 영역 */}
+                <div style={{ marginTop: 20 }}>
+                    <Space wrap>
+                        <Button
+                            icon={<SoundOutlined />}
+                            onClick={speakGerman}
+                        >
+                            음성 듣기
+                        </Button>
+
+                        {/* <Button onClick={startListening}>
+                            🎤 말하기
+                        </Button> */}
+
+                        <Button
+                            icon={<CopyOutlined />}
+                            onClick={copyToClipboard}
+                        >
+
+                        </Button>
+
+                        <Button
+                            icon={<SaveOutlined />}
+                            type="primary"
+                        >
+
+                        </Button>
+                    </Space>
+                </div>
+
             </Card>
         </Card>
     );
