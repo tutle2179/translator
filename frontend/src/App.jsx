@@ -4,16 +4,18 @@ import {
   MenuUnfoldOutlined,
   UserOutlined,
   HistoryOutlined,
-  GlobalOutlined,
 } from "@ant-design/icons";
 
-import { Layout, Menu, Button, Row, Col } from "antd";
+import { Layout, Menu, Button } from "antd";
+
 import TranslatorCard from "./components/TranslatorCard";
+import HistoryPanel from "./components/HistoryPanel";
 
 const { Header, Sider, Content } = Layout;
 
 function App() {
   const [collapsed, setCollapsed] = useState(false);
+  const [activePage, setActivePage] = useState("translate");
 
   return (
     <Layout style={{ height: "100vh" }}>
@@ -32,30 +34,30 @@ function App() {
             gap: 8,
           }}
         >
-          <GlobalOutlined />
-          {!collapsed && "Translator"}
+          {collapsed ? "T" : "Translator"}
         </div>
 
         <Menu
           theme="dark"
           mode="inline"
-          defaultSelectedKeys={["1"]}
+          selectedKeys={[activePage]}
+          onClick={({ key }) => setActivePage(key)}
           items={[
             {
-              key: "1",
+              key: "translate",
               icon: <UserOutlined />,
               label: "번역",
             },
             {
-              key: "2",
+              key: "history",
               icon: <HistoryOutlined />,
-              label: "히스토리",
+              label: "저장목록",
             },
           ]}
         />
       </Sider>
 
-      {/* 오른쪽 메인 영역 */}
+      {/* 오른쪽 영역 */}
       <Layout>
 
         {/* 상단 헤더 */}
@@ -77,39 +79,18 @@ function App() {
           />
         </Header>
 
-        {/* 메인 콘텐츠 */}
+        {/* 콘텐츠 영역 */}
         <Content
           style={{
             margin: 24,
             overflow: "auto",
           }}
         >
-          <Row gutter={[24, 24]}>
-
-            {/* 번역 카드 영역 */}
-            <Col xs={24} lg={16}>
-              <TranslatorCard />
-            </Col>
-
-            {/* 오른쪽 추가 영역 */}
-            <Col xs={24} lg={8}>
-              <div
-                style={{
-                  background: "white",
-                  padding: 20,
-                  borderRadius: 8,
-                  minHeight: 300,
-                }}
-              >
-                추가 기능 영역
-              </div>
-            </Col>
-
-          </Row>
-
+          {activePage === "translate" && <TranslatorCard />}
+          {activePage === "history" && <HistoryPanel />}
         </Content>
-      </Layout>
 
+      </Layout>
     </Layout>
   );
 }

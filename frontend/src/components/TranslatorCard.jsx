@@ -16,6 +16,7 @@ import {
 } from "@ant-design/icons";
 
 import { translateText } from "../api";
+import { saveTranslation } from "../api";
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -25,6 +26,7 @@ function TranslatorCard() {
     const [output, setOutput] = useState("");
     const [engine, setEngine] = useState("");
     const [loading, setLoading] = useState(false);
+    const [saved, setSaved] = useState(false);
 
     // 🔹 번역 실행
     const handleTranslate = async () => {
@@ -40,6 +42,7 @@ function TranslatorCard() {
             setEngine("");
         }
         setLoading(false);
+        setSaved(false);
     };
 
     // 🔹 독일어 음성 읽기
@@ -86,6 +89,19 @@ function TranslatorCard() {
         };
 
         recognition.start();
+    };
+
+    const handleSave = async () => {
+        if (!output || saved) return;
+
+        await saveTranslation({
+            source_text: input,
+            translated_text: output,
+            engine: engine,
+        });
+
+        message.success("저장 완료");
+        setSaved(true);
     };
 
     return (
@@ -136,7 +152,6 @@ function TranslatorCard() {
                             icon={<SoundOutlined />}
                             onClick={speakGerman}
                         >
-                            음성 듣기
                         </Button>
 
                         {/* <Button onClick={startListening}>
@@ -147,12 +162,13 @@ function TranslatorCard() {
                             icon={<CopyOutlined />}
                             onClick={copyToClipboard}
                         >
-
                         </Button>
 
                         <Button
                             icon={<SaveOutlined />}
-                            type="primary"
+                            type={saved ? "default" : "primary"}
+                            disabled={saved}
+                            onClick={handleSave}
                         >
 
                         </Button>
