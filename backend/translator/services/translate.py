@@ -19,22 +19,28 @@ from .hf_translate import hf_translate
 DEEPL_API_KEY = os.getenv("DEEPL_API_KEY")
 translator = deepl.Translator(DEEPL_API_KEY)
 
-def translate_text(text, source="KO", target="DE"):
+
+
+def translate_text(text, target="DE"):
     try:
-        # 1️⃣ 1차: DeepL 시도
         result = translator.translate_text(
             text,
-            source_lang=source,
+            source_lang="KO",
             target_lang=target,
         )
+
+        print("DETECTED:", result.detected_source_lang)
+        print("TRANSLATED TEXT:", result.text)
+
         return {
             "text": result.text,
             "engine": "DeepL"
         }
 
     except Exception as e:
-        # 2️⃣ DeepL 실패 → Hugging Face 자동 전환
-        fallback_text = hf_translate(text)
+        print("DeepL Failed:", e)
+        fallback_text = hf_translate(text, target)
+
         return {
             "text": fallback_text,
             "engine": "HuggingFace"

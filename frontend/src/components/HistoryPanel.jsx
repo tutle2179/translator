@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
-import { Card, Button, Tag, Empty, Space } from "antd";
-import {
-    DeleteOutlined,
-    SoundOutlined,
-} from "@ant-design/icons";
+import { Card, Button, Empty, Space } from "antd";
+import { DeleteOutlined, SoundOutlined } from "@ant-design/icons";
 import { getHistory, deleteHistory } from "../api";
 
-function HistoryPanel() {
+function HistoryPanel({ activePage }) {
     const [data, setData] = useState([]);
     const [revealed, setRevealed] = useState({});
 
@@ -15,16 +12,19 @@ function HistoryPanel() {
         setData(res.data);
     };
 
+    // ✅ 저장목록 화면으로 "들어올 때마다" 갱신
     useEffect(() => {
-        fetchData();
-    }, []);
+        if (activePage === "history") {
+            fetchData();
+        }
+    }, [activePage]);
 
     const handleDelete = async (id) => {
         await deleteHistory(id);
         fetchData();
     };
 
-    // 🔊 독일어 음성 재생 함수
+    // 🔊 독일어 음성 재생 함수 (원래대로 유지)
     const speakGerman = (text) => {
         if (!text) return;
 
@@ -38,10 +38,7 @@ function HistoryPanel() {
 
     return (
         <Card title="저장목록">
-
-            {data.length === 0 && (
-                <Empty description="저장된 번역이 없습니다." />
-            )}
+            {data.length === 0 && <Empty description="저장된 번역이 없습니다." />}
 
             {data.map((item) => (
                 <Card
@@ -86,7 +83,6 @@ function HistoryPanel() {
                             {item.source_text}
                         </span>
                     }
-
                     extra={
                         <Button
                             danger
@@ -98,7 +94,6 @@ function HistoryPanel() {
                         </Button>
                     }
                 >
-                    {/* 번역 텍스트 + 음성 버튼 */}
                     <Space align="start">
                         <span>{item.translated_text}</span>
 
@@ -108,14 +103,8 @@ function HistoryPanel() {
                             onClick={() => speakGerman(item.translated_text)}
                         />
                     </Space>
-
-                    <div style={{ marginTop: 8 }}>
-                        {/* <Tag color="blue">{item.engine}</Tag> */}
-                    </div>
-
                 </Card>
             ))}
-
         </Card>
     );
 }

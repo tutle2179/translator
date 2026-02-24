@@ -10,11 +10,12 @@ import json
 @api_view(["POST"])
 def translate_api(request):
     text = request.data.get("text", "")
+    target_lang = request.data.get("target_lang", "DE")  # 기본 독일어
 
     if not text.strip():
         return Response({"error": "No text"}, status=400)
 
-    result = translate_text(text)
+    result = translate_text(text, target_lang)
 
     return Response({
         "result": result["text"],

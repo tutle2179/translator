@@ -2,13 +2,13 @@ import axios from "axios";
 
 const BASE_URL = "http://127.0.0.1:8000/api/";
 
-export const translateText = async (text) => {
-    const res = await axios.post("http://127.0.0.1:8000/api/translate/", {
+export const translateText = async (text, targetLang) => {
+    const res = await axios.post(BASE_URL + "translate/", {
         text: text,
+        target_lang: targetLang,
     });
     return res.data;
 };
-
 
 export const saveTranslation = (data) =>
     axios.post(BASE_URL + "save/", data);

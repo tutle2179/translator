@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -15,11 +15,19 @@ const { Header, Sider, Content } = Layout;
 
 function App() {
   const [collapsed, setCollapsed] = useState(false);
-  const [activePage, setActivePage] = useState("translate");
+
+  // ✅ 새로고침해도 현재 페이지 유지
+  const [activePage, setActivePage] = useState(() => {
+    return sessionStorage.getItem("activePage") || "translate";
+  });
+
+  // ✅ activePage가 바뀔 때마다 저장
+  useEffect(() => {
+    sessionStorage.setItem("activePage", activePage);
+  }, [activePage]);
 
   return (
     <Layout style={{ height: "100vh" }}>
-
       {/* 왼쪽 사이드 메뉴 */}
       <Sider collapsible collapsed={collapsed} trigger={null}>
         <div
@@ -59,7 +67,6 @@ function App() {
 
       {/* 오른쪽 영역 */}
       <Layout>
-
         {/* 상단 헤더 */}
         <Header
           style={{
@@ -86,10 +93,16 @@ function App() {
             overflow: "auto",
           }}
         >
-          {activePage === "translate" && <TranslatorCard />}
-          {activePage === "history" && <HistoryPanel />}
-        </Content>
+          {/* ✅ 컴포넌트 유지 + 화면만 토글 */}
+          <div style={{ display: activePage === "translate" ? "block" : "none" }}>
+            <TranslatorCard />
+          </div>
 
+          <div style={{ display: activePage === "history" ? "block" : "none" }}>
+            {/* ✅ history로 들어올 때마다 새로 불러오게 activePage 전달 */}
+            <HistoryPanel activePage={activePage} />
+          </div>
+        </Content>
       </Layout>
     </Layout>
   );
