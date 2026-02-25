@@ -5,6 +5,7 @@ MODEL_MAP = {
     "DE": "Helsinki-NLP/opus-mt-ko-de",
     "FR": "Helsinki-NLP/opus-mt-ko-fr",
     "ES": "Helsinki-NLP/opus-mt-ko-es",
+    "JA": "Helsinki-NLP/opus-mt-ko-ja",
 }
 
 # 모델 캐시 (한 번만 로드)

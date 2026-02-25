@@ -32,6 +32,7 @@ function TranslatorCard() {
         DE: "독일어",
         FR: "프랑스어",
         ES: "스페인어",
+        JA: "일본어",
     };
 
     // 선택 완료 버튼
@@ -48,10 +49,16 @@ function TranslatorCard() {
 
         try {
             const promises = confirmedLangs.map(async (lang) => {
+                // 1차 번역
                 const res = await translateText(input, lang);
+
+                // 2차 재번역 (한국어로)
+                const backRes = await translateText(res.result, "KO");
+
                 return {
                     lang,
                     text: res.result,
+                    backText: backRes.result,   // ✅ 추가
                     engine: res.engine,
                     saved: false,
                 };
@@ -88,6 +95,7 @@ function TranslatorCard() {
         if (lang === "DE") utterance.lang = "de-DE";
         if (lang === "FR") utterance.lang = "fr-FR";
         if (lang === "ES") utterance.lang = "es-ES";
+        if (lang === "JA") utterance.lang = "ja-JP";
 
         utterance.rate = 0.9;
         window.speechSynthesis.speak(utterance);
@@ -126,6 +134,7 @@ function TranslatorCard() {
                         <Option value="DE">독일어</Option>
                         <Option value="FR">프랑스어</Option>
                         <Option value="ES">스페인어</Option>
+                        <Option value="JA">일본어</Option>
                     </Select>
 
                     <Button onClick={handleConfirmSelection}>
@@ -166,6 +175,18 @@ function TranslatorCard() {
                         value={results[0]?.text || ""}
                         readOnly
                     />
+                    {results[0]?.backText && (
+                        <>
+                            <div style={{ marginTop: 10, fontWeight: "bold" }}>
+                                한국어 재번역
+                            </div>
+                            <TextArea
+                                rows={3}
+                                value={results[0].backText}
+                                readOnly
+                            />
+                        </>
+                    )}
 
                     <div style={{ marginTop: 15 }}>
                         <Space>
@@ -225,6 +246,18 @@ function TranslatorCard() {
                                         value={item?.text || ""}
                                         readOnly
                                     />
+                                    {item?.backText && (
+                                        <>
+                                            <div style={{ marginTop: 10, fontWeight: "bold" }}>
+                                                한국어 재번역
+                                            </div>
+                                            <TextArea
+                                                rows={3}
+                                                value={item.backText}
+                                                readOnly
+                                            />
+                                        </>
+                                    )}
 
                                     <div style={{ marginTop: 15 }}>
                                         <Space>

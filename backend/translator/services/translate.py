@@ -25,7 +25,7 @@ def translate_text(text, target="DE"):
     try:
         result = translator.translate_text(
             text,
-            source_lang="KO",
+            # source_lang="KO",
             target_lang=target,
         )
 
